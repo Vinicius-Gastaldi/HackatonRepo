@@ -8,11 +8,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
-
-// Define your fictitious WhatsApp number
-const FICTITIOUS_WHATSAPP_NUMBER = "+1 (555) GOURMET-AI"; // Or a more standard format like +1 555 123 4567
-
-const SYSTEM_TEMPLATE = `You are an AI assistant for a restaurant called GourmetAI.
+const FICTITIOUS_WHATSAPP_NUMBER = "(47)9912-3123";
+const SYSTEM_TEMPLATE = `You are an AI assistant for a restaurant called GourmetAI. 
 You help customers with menu recommendations, taking orders, and answering questions about the restaurant.
 
 Restaurant Information:
@@ -86,7 +83,7 @@ Deno.serve(async (req) => {
 
     // Initialize the chat model
     const chat = new ChatOpenAI({
-      modelName: 'gpt-3.5-turbo', // Or 'gpt-4' if you have access, for better instruction following
+      modelName: 'gpt-3.5-turbo',
       temperature: 0.7,
     });
 
@@ -95,8 +92,8 @@ Deno.serve(async (req) => {
 
     // Format chat history
     const chatHistory = messages
-      .slice(0, -1) // Exclude the current user message
-      .map((msg) => `${msg.role === 'user' ? 'Customer' : 'AI'}: ${msg.content}`) // Assuming 'user' and 'assistant'/'ai' roles
+      .slice(0, -1)
+      .map((msg) => `${msg.sender}: ${msg.content}`)
       .join('\n');
 
     // Get the user's message
@@ -122,11 +119,8 @@ Deno.serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error processing request:', error); // Log the full error
-    // In case of an unexpected server-side error, you might also want to suggest contacting support
-    const errorMessage = "I encountered an unexpected issue. Please try again later. If the problem persists, you can contact us on WhatsApp at " + FICTITIOUS_WHATSAPP_NUMBER + ".";
     return new Response(
-      JSON.stringify({ response: errorMessage, error: error.message }), // Include the error message if in dev, or a generic one in prod
+      JSON.stringify({ error: error.message }),
       {
         status: 500,
         headers: {
